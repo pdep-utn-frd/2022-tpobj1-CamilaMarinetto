@@ -12,6 +12,9 @@ object juego{
 		game.addVisual(cactus)
 		game.addVisual(dino)
 		game.addVisual(reloj)
+		game.addVisual(copo)
+		game.addVisual(lluvia)
+		
 	
 		keyboard.space().onPressDo{ self.jugar()}
 		
@@ -23,6 +26,7 @@ object juego{
 		dino.iniciar()
 		reloj.iniciar()
 		cactus.iniciar()
+		copo.iniciar()
 	}
 	
 	method jugar(){
@@ -40,6 +44,7 @@ object juego{
 		cactus.detener()
 		reloj.detener()
 		dino.morir()
+		copo.detener()
 	}
 	
 }
@@ -72,7 +77,7 @@ object reloj {
 
 object cactus {
 	 
-	const posicionInicial = game.at(game.width()-1,suelo.position().y())
+	const posicionInicial = game.at(game.width()-2,suelo.position().y())
 	var position = posicionInicial
 
 	method image() = "cactus.png"
@@ -118,7 +123,7 @@ object dino {
 			game.schedule(velocidad*3,{self.bajar()})
 		}
 	}
-	
+		
 	method subir(){
 		position = position.up(1)
 	}
@@ -136,4 +141,53 @@ object dino {
 	method estaVivo() {
 		return vivo
 	}
+}
+
+object copo{
+	const posicionInicial = game.at(game.width(),suelo.position().y()+1)
+	var position = posicionInicial
+	var x = 0
+
+	method image() = "copo.png"
+	method position() = position
+	
+	method iniciar(){
+		position = posicionInicial
+		game.onTick(velocidad,"moverCopo",{self.mover()})
+	}
+	
+	method mover(){
+		position = position.left(1)
+		if (position.x() == -1)
+			position = posicionInicial
+	}
+	
+	method chocar(){
+		x = x + 1
+		if ((x%2) != 0) {
+			game.removeVisual(lluvia)
+			game.addVisual(nieve)
+			}
+		else {
+			game.addVisual(lluvia)
+			game.removeVisual(nieve)
+			}
+		}
+		
+
+	
+    method detener(){
+    	game.removeTickEvent("moverCopo")
+	}
+}
+
+ object nieve{
+	
+	method image() = "nieve.png"
+	method position() = game.at(0,suelo.position().y()-3)
+}
+
+object lluvia{
+	method image() = "lluvia.png"
+	method position() = game.at(0,suelo.position().y())
 }
